@@ -45,6 +45,7 @@ public class UsuarioDTO implements Serializable {
     String clienteNombre = Generales.EMPTYSTRING;
     String registradoPor = Generales.EMPTYSTRING;
     String fechaRegistro = Generales.EMPTYSTRING;
+    ArrayList<MenuDTO> menu = new ArrayList<>();
 
     public String getDescripcionErrorLogueo() {
         return descripcionErrorLogueo;
@@ -252,6 +253,14 @@ public class UsuarioDTO implements Serializable {
 
     public void setDepartamento(String departamento) {
         this.departamento = departamento;
+    }
+
+    public ArrayList<MenuDTO> getMenu() {
+        return menu;
+    }
+
+    public void setMenu(ArrayList<MenuDTO> menu) {
+        this.menu = menu;
     }
 
     public String toStringJson() {

@@ -30,7 +30,9 @@
 
                 if (datosUsuario.getIdTipoUsuario().equals("1")) {
                     //  session.setAttribute("paginaInicial", "index_superadmin.jsp");
+                    System.out.println("estamos en index control "+ datosUsuario.toStringJson());
                     request.getRequestDispatcher("/inicio.jsp").forward(request, response);
+                    
 
                 }
             } else {

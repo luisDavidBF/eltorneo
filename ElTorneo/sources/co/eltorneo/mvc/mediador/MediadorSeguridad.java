@@ -1,4 +1,4 @@
- /*
+/*
  * MediadorSeguridad.java
  *
  * Proyecto: Gestion de Creditos
@@ -11,7 +11,11 @@ package co.eltorneo.mvc.mediador;
 import co.eltorneo.common.connection.ContextDataResourceNames;
 import co.eltorneo.common.connection.DataBaseConnection;
 import co.eltorneo.common.util.LoggerMessage;
+import co.eltorneo.mvc.dao.FuncionalidadesDAO;
+import co.eltorneo.mvc.dao.MenuDAO;
 import co.eltorneo.mvc.dao.UsuariosDAO;
+import co.eltorneo.mvc.dto.FuncionalidadDTO;
+import co.eltorneo.mvc.dto.MenuDTO;
 import co.eltorneo.mvc.dto.UsuarioDTO;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
@@ -67,9 +71,19 @@ public class MediadorSeguridad {
             if (datosUsuario != null) {
                 System.out.println("Mediador seguridad >>>>> datos de usuario logueado  " + datosUsuario.toStringJson());
 
-
                 datosUsuario = new UsuariosDAO().consultarDatosUsuarioLogueado(conexion, usuario);
                 datosUsuario.setDescripcionErrorLogueo(mensajeError);
+
+                ArrayList<MenuDTO> datosMenu = new MenuDAO().listarMenusPorUsuario(conexion, datosUsuario.getIdUsuario());
+                if (datosMenu != null) {
+                    for (int j = 0; j < datosMenu.size(); j++) {
+                        ArrayList<FuncionalidadDTO> datosFuncionalidades = new FuncionalidadesDAO().listarFuncionalidadesPorMenu(conexion, datosMenu.get(j).getId(), datosUsuario.getIdUsuario());
+                        datosMenu.get(j).setFuncionalidad(datosFuncionalidades);
+                    }
+                }
+
+                datosUsuario.setMenu(datosMenu);
+                System.out.println("datos Usuario logueado::con menu " + datosUsuario.toStringJson());
 
             }
 

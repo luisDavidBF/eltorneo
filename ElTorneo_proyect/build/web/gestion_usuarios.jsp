@@ -1,10 +1,4 @@
-<%-- 
-    Document   : index_administrador
-    Created on : 29/12/2016, 08:43:18 AM
-    Author     : DANNY
---%>
 
-<%@page import="co.mobiltech.unicloud.mvc.dto.UsuarioDTO"%>
 <%-- TABLA ADMINISTRADOR (USUARIOS) --%>
 <%
 
