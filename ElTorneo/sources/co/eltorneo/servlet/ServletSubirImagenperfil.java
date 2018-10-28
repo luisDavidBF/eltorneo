@@ -121,16 +121,16 @@ public class ServletSubirImagenperfil extends HttpServlet {
                         if ("image/jpeg".equals(item.getContentType()) || "image/png".equals(item.getContentType())) {
 
                             System.out.println("Servlet imgperfil >>>> idCliente en sesion es actualización   " + request.getParameter("idUsuario"));
-                            datos.setIdUsuario(request.getParameter("idUsuario"));
+                            datos.setId(request.getParameter("idUsuario"));
 
-                            if (datos.getIdUsuario() != null && !datos.getIdUsuario().equals("")) {
+                            if (datos.getId() != null && !datos.getId().equals("")) {
                             } else {
-                                datos.setIdUsuario(servletSesion.getAttribute("idUsuario").toString());
-                                System.out.println("Servlet imgperfil >>>>idCiente en sesion es registro nuevo" + datos.getIdUsuario());
+                                datos.setId(servletSesion.getAttribute("idUsuario").toString());
+                                System.out.println("Servlet imgperfil >>>>idCiente en sesion es registro nuevo" + datos.getId());
                             }
 
                             File uploadDir = new File(pathToWeb);
-                            File file = new File(uploadDir, Constantes.NOMBRE_IMAGEN_PERIL_USUARIO + datos.getIdUsuario() + ".png");
+                            File file = new File(uploadDir, Constantes.NOMBRE_IMAGEN_PERIL_USUARIO + datos.getId() + ".png");
                             System.out.println("nombre del archivo>>>>> " + file.getName());
 
                             item.write(file);

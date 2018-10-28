@@ -13,7 +13,7 @@ import co.eltorneo.common.connection.DataBaseConnection;
 import co.eltorneo.common.util.LoggerMessage;
 import co.eltorneo.mvc.dao.FuncionalidadesDAO;
 import co.eltorneo.mvc.dao.MenuDAO;
-import co.eltorneo.mvc.dao.UsuariosDAO;
+import co.eltorneo.mvc.dao.UsuarioDAO;
 import co.eltorneo.mvc.dto.FuncionalidadDTO;
 import co.eltorneo.mvc.dto.MenuDTO;
 import co.eltorneo.mvc.dto.UsuarioDTO;
@@ -66,18 +66,18 @@ public class MediadorSeguridad {
 
             dbcon = DataBaseConnection.getInstance();
             conexion = dbcon.getConnection(ContextDataResourceNames.MYSQL_ELTORNEO_JDBC);
-            datosUsuario = new UsuariosDAO().consultarDatosUsuarioLogueado(conexion, usuario);
+            datosUsuario = new UsuarioDAO().consultarDatosUsuarioLogueado(conexion, usuario);
             System.out.println("llego al mediador de seguridad");
             if (datosUsuario != null) {
                 System.out.println("Mediador seguridad >>>>> datos de usuario logueado  " + datosUsuario.toStringJson());
 
-                datosUsuario = new UsuariosDAO().consultarDatosUsuarioLogueado(conexion, usuario);
+                datosUsuario = new UsuarioDAO().consultarDatosUsuarioLogueado(conexion, usuario);
                 datosUsuario.setDescripcionErrorLogueo(mensajeError);
 
-                ArrayList<MenuDTO> datosMenu = new MenuDAO().listarMenusPorUsuario(conexion, datosUsuario.getIdUsuario());
+                ArrayList<MenuDTO> datosMenu = new MenuDAO().listarMenusPorUsuario(conexion, datosUsuario.getId());
                 if (datosMenu != null) {
                     for (int j = 0; j < datosMenu.size(); j++) {
-                        ArrayList<FuncionalidadDTO> datosFuncionalidades = new FuncionalidadesDAO().listarFuncionalidadesPorMenu(conexion, datosMenu.get(j).getId(), datosUsuario.getIdUsuario());
+                        ArrayList<FuncionalidadDTO> datosFuncionalidades = new FuncionalidadesDAO().listarFuncionalidadesPorMenu(conexion, datosMenu.get(j).getId(), datosUsuario.getId());
                         datosMenu.get(j).setFuncionalidad(datosFuncionalidades);
                     }
                 }
@@ -112,9 +112,4 @@ public class MediadorSeguridad {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     * LOS METODOS APARTIR DE AQUI NO HAN SIDO VALIDADOS
-     * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     */
 }
