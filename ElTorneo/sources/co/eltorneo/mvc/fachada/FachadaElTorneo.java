@@ -55,15 +55,15 @@ public class FachadaElTorneo {
         return MediadorElTorneo.getInstancia().recuperarContrasenia(documento);
     }
 
-    /**
+    /**aqui usted llama los metodos que hizo en el mediador y el dao, es como el puente entre la vista y codigo
      *
      * @param tecnico
      * @param usuario
      * @return
      */
-    @RemoteMethod
-    public RespuestaDTO registrarTecnico(TecnicoDTO tecnico, UsuarioDTO usuario) {
-        return MediadorElTorneo.getInstancia().registrarTecnico(tecnico, usuario);
+    @RemoteMethod //para que en los jsp le reconozca el metodo debe estar esta anotacion @RemoteMethod
+    public RespuestaDTO registrarTecnico(TecnicoDTO tecnico, UsuarioDTO usuario) { //declara el nombre del metodo como lo va a llamar en el jsp
+        return MediadorElTorneo.getInstancia().registrarTecnico(tecnico, usuario); // llama los metodos que hizo en el mediador
     }
 
     /**
@@ -132,5 +132,10 @@ public class FachadaElTorneo {
     @RemoteMethod
     public ArrayList<JugadorDTO> listarJugadores() {
         return MediadorElTorneo.getInstancia().listarJugadores();
+    }
+
+    @RemoteMethod
+    public RespuestaDTO sorteoDePartidos(String fechaInicio) {
+        return MediadorElTorneo.getInstancia().sorteoDePartidos(fechaInicio);
     }
 }

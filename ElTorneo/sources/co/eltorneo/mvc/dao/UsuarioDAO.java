@@ -400,7 +400,7 @@ public class UsuarioDAO {
     }
 
     /**
-     *
+     * los daos que ya conocemos
      * @param conexion
      * @param usuario
      * @return
@@ -410,7 +410,7 @@ public class UsuarioDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         int nRows = 0;
-        StringBuilder cadSQL = null;
+        StringBuilder cadSQL = null; //para crear el ddl 
         RespuestaDTO registro = null;
 
         try {
@@ -422,19 +422,22 @@ public class UsuarioDAO {
 
             ps = conexion.prepareStatement(cadSQL.toString(), Statement.RETURN_GENERATED_KEYS);
 
-            AsignaAtributoStatement.setString(1, usuario.getCorreo(), ps);
+            AsignaAtributoStatement.setString(1, usuario.getCorreo(), ps);// se envian los datos a los ?, el orden importa mucho
             AsignaAtributoStatement.setString(2, usuario.getUsuario(), ps);
             AsignaAtributoStatement.setString(3, usuario.getIdTipoUsuario(), ps);
             AsignaAtributoStatement.setString(4, usuario.getClave(), ps);
 
-            nRows = ps.executeUpdate();
-            if (nRows > 0) {
-                rs = ps.getGeneratedKeys();
+            nRows = ps.executeUpdate(); // ejecuta el proceso
+            if (nRows > 0) { //nRows es el numero de filas que hubo de movimiento, es decir si hizo el registro, con este if se sabe
+                rs = ps.getGeneratedKeys(); // esto se usa para capturar el id recien ingresado en caso de necesitarlo despues
                 if (rs.next()) {
                     registro.setRegistro(true);
-                    registro.setIdResgistrado(rs.getString(1));
+                    registro.setIdResgistrado(rs.getString(1)); // guardo el id en en este atributo del objeto
 
                 }
+                // cerramos los rs y ps
+                ps.close();
+                ps = null;
                 rs.close();
                 rs = null;
             }

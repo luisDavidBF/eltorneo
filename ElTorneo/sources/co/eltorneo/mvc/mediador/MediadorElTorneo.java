@@ -13,12 +13,16 @@ import co.eltorneo.common.util.LoggerMessage;
 import co.eltorneo.hilo.Correo;
 import co.eltorneo.mvc.dao.ArbitroDAO;
 import co.eltorneo.mvc.dao.EquipoDAO;
+import co.eltorneo.mvc.dao.HorarioDAO;
 import co.eltorneo.mvc.dao.JugadorDAO;
+import co.eltorneo.mvc.dao.PartidoDAO;
 import co.eltorneo.mvc.dao.TecnicoDAO;
 import co.eltorneo.mvc.dao.UsuarioDAO;
 import co.eltorneo.mvc.dto.ArbitroDTO;
 import co.eltorneo.mvc.dto.EquipoDTO;
+import co.eltorneo.mvc.dto.HorarioDTO;
 import co.eltorneo.mvc.dto.JugadorDTO;
+import co.eltorneo.mvc.dto.PartidoDTO;
 import co.eltorneo.mvc.dto.RespuestaDTO;
 import co.eltorneo.mvc.dto.TecnicoDTO;
 import co.eltorneo.mvc.dto.UsuarioDTO;
@@ -27,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -108,29 +113,37 @@ public class MediadorElTorneo {
     }
 
     /**
-     *
+     *ahora el mediador es donde uno mas codigo hace, es donde uno mezcla funciones con tal de llegar a la solucion del metodo
      * @param tecnico
      * @param usuario
      * @return
      */
-    public RespuestaDTO registrarTecnico(TecnicoDTO tecnico, UsuarioDTO usuario) {
+    public RespuestaDTO registrarTecnico(TecnicoDTO tecnico, UsuarioDTO usuario) {  // se declara un metodo normal como sabemos, este devuelve un objeto respuesta, ese objeto lo cree para devolver si se registro y mensaje si necesito
 
         DataBaseConnection dbcon = null;
         Connection conexion = null;
         RespuestaDTO respuesta = null, respuesta2 = new RespuestaDTO();
 
+        // en esta parte creo las variables que voy a utilizar, casi siempre estan la conexion y la dbconexion
+        
+        
         String password = "";
         try {
-            password = UUID.randomUUID().toString().substring(0, 8);
-            usuario.setClave(password);
+            password = UUID.randomUUID().toString().substring(0, 8); //genera la contraseña aleatoria entre 0 y 8 caracteres
+            usuario.setClave(password); // se la pongo al atributo del objeto que llega
+            
+            //// estas dos lineas siempre van, son para la conexion a la base de datos
             dbcon = DataBaseConnection.getInstance();
             conexion = dbcon.getConnection(ContextDataResourceNames.MYSQL_ELTORNEO_JDBC);
-            conexion.setAutoCommit(false);
+            ///
+            
+            conexion.setAutoCommit(false); // estos es para casos en los que uno hacer varios insert en el metodo
+            //para lo que funciona es para que se haga todo o nada, es decir si falla algo se devuelva y no haga nada.... este es como un punto de guardado
 
-            respuesta = new UsuarioDAO().registrarUsuario(conexion, usuario);
-            if (!respuesta.isRegistro()) {
-                respuesta.setMensaje("No se pudo registrar el tecnico");
-                conexion.rollback();
+            respuesta = new UsuarioDAO().registrarUsuario(conexion, usuario); // llama al metodo del dao
+            if (!respuesta.isRegistro()) { // si no registro haga esto
+                respuesta.setMensaje("No se pudo registrar el tecnico");// devuelco dentro del objeto respuesta un mensaje para saber en donde fallo
+                conexion.rollback();  // este es el que hace que se devuelva al punto de guardado en caso que no funcione un metodo
                 throw new Exception("ERROR: no se pudo registrar el tecnico");
             }
             tecnico.setIdUsuario(respuesta.getIdResgistrado());
@@ -144,16 +157,17 @@ public class MediadorElTorneo {
 
             }
 
-            Correo envio = new Correo(usuario.getCorreo(), usuario.getClave(), "1", tecnico.getNombre(), "1", "ninguna");
+            // esta es la parte donde envio el correo, to lo meti en un hilo para que se vaya enviando en paralelo y sea mas rapido el metodo
+            Correo envio = new Correo(usuario.getCorreo(), usuario.getClave(), "1", tecnico.getNombre(), "1", "ninguna"); //el contructor del hilo
             envio.start();
 
             respuesta.setMensaje("Se ha registrado el tecnico satisfactoriamente");
-            conexion.commit();
-            conexion.close();
+            conexion.commit(); //esta linea es cuando se hacen todo bn, se hace como punto de salvado
+            conexion.close(); //se cierra la conexion
             conexion = null;
-        } catch (Exception e) {
+        } catch (Exception e) {//los catch es para capturar lo errores y saber que fallo
             LoggerMessage.getInstancia().loggerMessageException(e);
-        } finally {
+        } finally { // el finally es algo que oblig que el metodo simpre termine por ahi, en este caso, si esta abierta la conexion que la cierre
             try {
                 if (conexion != null && !conexion.isClosed()) {
                     conexion.close();
@@ -550,6 +564,161 @@ public class MediadorElTorneo {
                 }
             }
             return jugadores;
+        }
+
+    }
+
+    /**
+     *
+     * @param fechaInicio
+     * @return
+     */
+    public RespuestaDTO sorteoDePartidos(String fechaInicio) {
+        DataBaseConnection dbcon = null;
+        Connection conexion = null;
+        RespuestaDTO respuesta = null;
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        ArrayList<EquipoDTO> equipos = null;
+        ArrayList<HorarioDTO> horarios = null;
+        PartidoDTO partido = null;
+        int dia = 1, nEquipos = 0;
+
+        try {
+            dbcon = DataBaseConnection.getInstance();
+            conexion = dbcon.getConnection(ContextDataResourceNames.MYSQL_ELTORNEO_JDBC);
+            conexion.setAutoCommit(false);
+
+            calendar.setTime(formato.parse(fechaInicio));
+
+            horarios = new HorarioDAO().listarHorarios(conexion);
+            equipos = new EquipoDAO().listarEquipos(conexion);
+            int nPartidosPorJornada = equipos.size() / 2;
+            nEquipos = equipos.size() - 1;
+            for (int i = 0; i < nEquipos - 1; i++) {
+
+                while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                    calendar.add(calendar.DAY_OF_YEAR, dia);
+                }
+
+                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+
+                    for (int m = 0; m < horarios.size(); m++) {
+                        if (nPartidosPorJornada > 0) {
+                            partido = new PartidoDTO();
+                            partido.setFechaPartido(formato.format(calendar.getTime()));
+                            partido.setEstado("0");
+                            partido.setTemporada("1");
+                            partido.setIdHorario(horarios.get(m).getId());
+                            partido.setJornada(i + 1);
+                            respuesta = new PartidoDAO().registrarPartido(conexion, partido);
+                            
+                            nPartidosPorJornada--;
+                        }
+
+                    }
+
+                    calendar.add(calendar.DAY_OF_YEAR, dia);
+                    if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+
+                        for (int h = 0; h < horarios.size(); h++) {
+                            if (nPartidosPorJornada > 0) {
+                                partido = new PartidoDTO();
+                                partido.setFechaPartido(formato.format(calendar.getTime()));
+                                partido.setEstado("0");
+                                partido.setTemporada("1");
+                                partido.setIdHorario(horarios.get(h).getId());
+                                partido.setJornada(i + 1);
+                                respuesta = new PartidoDAO().registrarPartido(conexion, partido);
+                                nPartidosPorJornada--;
+                            }
+                        }
+                        nPartidosPorJornada = equipos.size() / 2;
+                        calendar.add(calendar.DAY_OF_YEAR, dia);
+
+                    }
+                }
+
+            }
+
+            respuesta.setMensaje("Se ha realizado el sorteo!");
+            conexion.commit();
+            conexion.close();
+            conexion = null;
+        } catch (Exception e) {
+            LoggerMessage.getInstancia().loggerMessageException(e);
+        } finally {
+            try {
+                if (conexion != null && !conexion.isClosed()) {
+                    conexion.close();
+                    conexion = null;
+                }
+            } catch (Exception e) {
+                LoggerMessage.getInstancia().loggerMessageException(e);
+            } finally {
+                try {
+                    if (conexion != null && !conexion.isClosed()) {
+                        conexion.close();
+                        conexion = null;
+                    }
+
+                } catch (Exception e) {
+                    LoggerMessage.getInstancia().loggerMessageException(e);
+                }
+            }
+            return respuesta;
+        }
+
+    }
+
+    public RespuestaDTO sorteoDeEquipos(String fechaInicio) {
+        DataBaseConnection dbcon = null;
+        Connection conexion = null;
+        RespuestaDTO respuesta = null;
+        ArrayList<EquipoDTO> equipos = null;
+        ArrayList<PartidoDTO> partidos = null;
+        PartidoDTO partido = null;
+        int dia = 1;
+
+        try {
+            dbcon = DataBaseConnection.getInstance();
+            conexion = dbcon.getConnection(ContextDataResourceNames.MYSQL_ELTORNEO_JDBC);
+            conexion.setAutoCommit(false);
+
+            respuesta = sorteoDePartidos(fechaInicio);
+            if (respuesta == null) {
+                respuesta.setMensaje("No se pudo realizar el sorteo de partidos");
+                throw new Exception("ERROR: No se pudo realizar el sorteo de partidos");
+            } else {
+                partidos = new PartidoDAO().listarPartidos(conexion);
+            }
+
+            respuesta.setMensaje("Se ha realizado el sorteo!");
+            conexion.commit();
+            conexion.close();
+            conexion = null;
+        } catch (Exception e) {
+            LoggerMessage.getInstancia().loggerMessageException(e);
+        } finally {
+            try {
+                if (conexion != null && !conexion.isClosed()) {
+                    conexion.close();
+                    conexion = null;
+                }
+            } catch (Exception e) {
+                LoggerMessage.getInstancia().loggerMessageException(e);
+            } finally {
+                try {
+                    if (conexion != null && !conexion.isClosed()) {
+                        conexion.close();
+                        conexion = null;
+                    }
+
+                } catch (Exception e) {
+                    LoggerMessage.getInstancia().loggerMessageException(e);
+                }
+            }
+            return respuesta;
         }
 
     }

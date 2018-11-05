@@ -71,7 +71,7 @@ public class RespuestaDTO implements Serializable {
         this.idResgistrado = idResgistrado;
     }
     
-        public String toStringJson() {
+    public String toStringJson() {
         String dtoJsonString = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
