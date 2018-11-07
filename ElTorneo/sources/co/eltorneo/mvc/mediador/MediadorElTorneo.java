@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.jar.Pack200;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
@@ -113,7 +114,9 @@ public class MediadorElTorneo {
     }
 
     /**
-     *ahora el mediador es donde uno mas codigo hace, es donde uno mezcla funciones con tal de llegar a la solucion del metodo
+     * ahora el mediador es donde uno mas codigo hace, es donde uno mezcla
+     * funciones con tal de llegar a la solucion del metodo
+     *
      * @param tecnico
      * @param usuario
      * @return
@@ -125,18 +128,16 @@ public class MediadorElTorneo {
         RespuestaDTO respuesta = null, respuesta2 = new RespuestaDTO();
 
         // en esta parte creo las variables que voy a utilizar, casi siempre estan la conexion y la dbconexion
-        
-        
         String password = "";
         try {
             password = UUID.randomUUID().toString().substring(0, 8); //genera la contraseña aleatoria entre 0 y 8 caracteres
             usuario.setClave(password); // se la pongo al atributo del objeto que llega
-            
+
             //// estas dos lineas siempre van, son para la conexion a la base de datos
             dbcon = DataBaseConnection.getInstance();
             conexion = dbcon.getConnection(ContextDataResourceNames.MYSQL_ELTORNEO_JDBC);
             ///
-            
+
             conexion.setAutoCommit(false); // estos es para casos en los que uno hacer varios insert en el metodo
             //para lo que funciona es para que se haga todo o nada, es decir si falla algo se devuelva y no haga nada.... este es como un punto de guardado
 
@@ -577,11 +578,14 @@ public class MediadorElTorneo {
         DataBaseConnection dbcon = null;
         Connection conexion = null;
         RespuestaDTO respuesta = null;
+        RespuestaDTO respuesta2 = null;
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
         ArrayList<EquipoDTO> equipos = null;
+        ArrayList<EquipoDTO> equipos2 = null;
         ArrayList<HorarioDTO> horarios = null;
         PartidoDTO partido = null;
+        PartidoDTO partidoJuego = null;
         int dia = 1, nEquipos = 0;
 
         try {
@@ -593,10 +597,12 @@ public class MediadorElTorneo {
 
             horarios = new HorarioDAO().listarHorarios(conexion);
             equipos = new EquipoDAO().listarEquipos(conexion);
+            equipos2 = new EquipoDAO().listarEquipos(conexion);
             int nPartidosPorJornada = equipos.size() / 2;
             nEquipos = equipos.size() - 1;
-            for (int i = 0; i < nEquipos - 1; i++) {
-
+            int y = 0;
+            for (int i = 0; i < nEquipos; i++) {
+                y = 0;
                 while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                     calendar.add(calendar.DAY_OF_YEAR, dia);
                 }
@@ -612,8 +618,33 @@ public class MediadorElTorneo {
                             partido.setIdHorario(horarios.get(m).getId());
                             partido.setJornada(i + 1);
                             respuesta = new PartidoDAO().registrarPartido(conexion, partido);
-                            
-                            nPartidosPorJornada--;
+                            System.out.println("se registro el partido con el id " + respuesta.getIdResgistrado());
+                            if (respuesta.isRegistro()) {
+                                System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
+                                    System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    y++;
+                                }
+                                System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+
+                                partidoJuego = new PartidoDTO();
+                                partidoJuego.setId(respuesta.getIdResgistrado());
+                                partidoJuego.setEquipoA(equipos.get(y).getId());
+                                respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoA());
+                                y = 0;
+                                System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
+                                    System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    y++;
+                                }
+                                System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                partidoJuego.setEquipoB(equipos.get(y).getId());
+                                respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoB());
+                                nPartidosPorJornada--;
+                                y = 0;
+                            } else {
+                                System.out.println("no se registro el partido");
+                            }
                         }
 
                     }
@@ -630,7 +661,33 @@ public class MediadorElTorneo {
                                 partido.setIdHorario(horarios.get(h).getId());
                                 partido.setJornada(i + 1);
                                 respuesta = new PartidoDAO().registrarPartido(conexion, partido);
-                                nPartidosPorJornada--;
+                                System.out.println("se registro el partido con el id " + respuesta.getIdResgistrado());
+                                if (respuesta.isRegistro()) {
+                                    System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
+                                        System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                        y++;
+                                    }
+                                    System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+
+                                    partidoJuego = new PartidoDTO();
+                                    partidoJuego.setId(respuesta.getIdResgistrado());
+                                    partidoJuego.setEquipoA(equipos.get(y).getId());
+                                    respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoA());
+                                    y = 0;
+                                    System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
+                                        y++;
+                                        System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    }
+                                    System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+
+                                    partidoJuego.setEquipoB(equipos.get(y).getId());
+                                    respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoB());
+                                    nPartidosPorJornada--;
+                                } else {
+                                    System.out.println("no se registro elpartido");
+                                }
                             }
                         }
                         nPartidosPorJornada = equipos.size() / 2;
