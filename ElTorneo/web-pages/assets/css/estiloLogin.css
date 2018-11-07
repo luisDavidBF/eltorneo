@@ -1,0 +1,18 @@
+#fondo_login{
+    background: url(../images/balon_estadio.jpg);
+        background-size: cover;
+        background-position: center;
+    
+}
+
+#panelInicio{
+    background-color: rgba(255,255,255,0.7);
+    border: none;
+    border-radius: 20px;
+}
+#loginIcon{
+    margin-bottom: 6px;
+    margin-right: 6px;
+
+}
+    

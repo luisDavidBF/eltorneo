@@ -23,7 +23,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Eltorneo</title>
+        <title>Iniciar sesión - El Torneo</title>
 
         <!-- Global stylesheets -->
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
@@ -33,6 +33,7 @@
         <link href="assets/css/components.css" rel="stylesheet" type="text/css">
         <link href="assets/css/colors.css" rel="stylesheet" type="text/css">
         <link href="assets/css/integral-core.css" rel="stylesheet" type="text/css">
+        <link href="assets/css/estiloLogin.css" rel="stylesheet" type="text/css">
 
         <!-- /global stylesheets -->
 
@@ -69,7 +70,7 @@
 
 
         <!-- Page container -->
-        <div class="page-container login-fondo">
+        <div class="page-container" id="fondo_login">
 
             <!-- Page content -->
             <div class="page-content">
@@ -91,24 +92,25 @@
                             </div>
                             </p>
                             <% }%>
-                            <div class="panel panel-body login-form">
+                            <div class="panel panel-body login-form" id="panelInicio">
                                 <div class="text-center">
                                     <!--<div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>-->
-                                    <div><img src="assets/images/logo_login.jpg" alt=""></div>
-                                    <h5 class="content-group">Iniciar cesión<small class="display-block"></small></h5>
+                                    <div><img src="assets/images/logo_eltorneo.png" alt=""></div>
+                                    <h5 class="content-group">Iniciar sesión<small class="display-block"></small></h5>
                                 </div>
 
                                 <div class="form-group has-feedback has-feedback-left">                                    
                                     <input name="j_username" type="text" class="form-control text-input" placeholder="Usuario" autocomplete="off">
                                     <div class="form-control-feedback">
-                                        <i class="icon-user text-muted"></i>
+                                        <i class="icon-user text-muted"> <img src="assets/images/usuario.png" width="16" height="16" alt="password" id="loginIcon"/> </i>
                                     </div>
                                 </div>
 
                                 <div class="form-group has-feedback has-feedback-left">                                    
-                                    <input name="j_password" type="password" class="form-control text-input" placeholder="********" autocomplete="off">
+                                    <input name="j_password" type="password" class="form-control text-input" placeholder="Contraseña    " autocomplete="off">
                                     <div class="form-control-feedback">
-                                        <i class="icon-lock2 text-muted"></i>
+                                        <i class="icon-lock2 text-muted"> <img src="assets/images/password.png" width="16" height="16" alt="password" id="loginIcon"/>
+                                        </i>
                                     </div>
                                 </div>
 
