@@ -597,7 +597,7 @@ public class MediadorElTorneo {
 
             horarios = new HorarioDAO().listarHorarios(conexion);
             equipos = new EquipoDAO().listarEquipos(conexion);
-            equipos2 = new EquipoDAO().listarEquipos(conexion);
+ 
             int nPartidosPorJornada = equipos.size() / 2;
             nEquipos = equipos.size() - 1;
             int y = 0;
@@ -620,24 +620,24 @@ public class MediadorElTorneo {
                             respuesta = new PartidoDAO().registrarPartido(conexion, partido);
                             System.out.println("se registro el partido con el id " + respuesta.getIdResgistrado());
                             if (respuesta.isRegistro()) {
-                                System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
-                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
-                                    System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                System.out.println("va a validar el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
+                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos.get(y).getId(), partido.getJornada())) {
+                                    System.out.println("si existe el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                     y++;
                                 }
-                                System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                System.out.println("paso el equipo con -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
 
                                 partidoJuego = new PartidoDTO();
                                 partidoJuego.setId(respuesta.getIdResgistrado());
                                 partidoJuego.setEquipoA(equipos.get(y).getId());
                                 respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoA());
                                 y = 0;
-                                System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
-                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
-                                    System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                System.out.println("va a validar el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
+                                while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos.get(y).getId(), partido.getJornada())) {
+                                    System.out.println("si existe el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                     y++;
                                 }
-                                System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                System.out.println("paso el equipo con -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                 partidoJuego.setEquipoB(equipos.get(y).getId());
                                 respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoB());
                                 nPartidosPorJornada--;
@@ -663,9 +663,9 @@ public class MediadorElTorneo {
                                 respuesta = new PartidoDAO().registrarPartido(conexion, partido);
                                 System.out.println("se registro el partido con el id " + respuesta.getIdResgistrado());
                                 if (respuesta.isRegistro()) {
-                                    System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    System.out.println("va a validar el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                     while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
-                                        System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                        System.out.println("si existe el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                         y++;
                                     }
                                     System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
@@ -675,12 +675,12 @@ public class MediadorElTorneo {
                                     partidoJuego.setEquipoA(equipos.get(y).getId());
                                     respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoA());
                                     y = 0;
-                                    System.out.println("va a validar el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
-                                    while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos2.get(y).getId(), partido.getJornada())) {
+                                    System.out.println("va a validar el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    while (new PartidoDAO().validarEquipoPorJornada(conexion, equipos.get(y).getId(), partido.getJornada())) {
                                         y++;
-                                        System.out.println("si existe el equipo -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                        System.out.println("si existe el equipo -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
                                     }
-                                    System.out.println("paso el equipo con -> " + equipos2.get(y).getId() + "en la jornada " + partido.getJornada());
+                                    System.out.println("paso el equipo con -> " + equipos.get(y).getId() + "en la jornada " + partido.getJornada());
 
                                     partidoJuego.setEquipoB(equipos.get(y).getId());
                                     respuesta2 = new PartidoDAO().registrarPartidoJuego(conexion, partidoJuego, partidoJuego.getEquipoB());
