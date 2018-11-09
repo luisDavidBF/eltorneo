@@ -32,7 +32,7 @@ public class PartidoDAO {
 
         try {
             registro = new RespuestaDTO();
-            System.out.println("partido " + partido.toStringJson());
+            // System.out.println("partido " + partido.toStringJson());
             cadSQL = new StringBuilder();
             cadSQL.append(" INSERT INTO partido(part_dia, hopa_id,part_jornada,temp_id)");
             cadSQL.append(" VALUES (?, ?, ? ,?) ");
@@ -72,7 +72,7 @@ public class PartidoDAO {
      * @return
      * @throws SQLException
      */
-    public RespuestaDTO registrarPartidoJuego(Connection conexion, PartidoDTO partido) throws SQLException {
+    public RespuestaDTO registrarPartidoJuego(Connection conexion, PartidoDTO partido, String idEquipo) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         int nRows = 0;
@@ -81,14 +81,14 @@ public class PartidoDAO {
 
         try {
             registro = new RespuestaDTO();
-            System.out.println("partido " + partido.toStringJson());
+            //System.out.println("partido " + partido.toStringJson());
             cadSQL = new StringBuilder();
             cadSQL.append(" INSERT INTO partido_equipo(equi_id, part_id)");
             cadSQL.append(" VALUES (?,?) ");
 
             ps = conexion.prepareStatement(cadSQL.toString(), Statement.RETURN_GENERATED_KEYS);
 
-            AsignaAtributoStatement.setString(1, partido.getEquipoA(), ps);
+            AsignaAtributoStatement.setString(1, idEquipo, ps);
             AsignaAtributoStatement.setString(2, partido.getId(), ps);
 
             nRows = ps.executeUpdate();
@@ -174,7 +174,7 @@ public class PartidoDAO {
      * @param jornada
      * @return
      */
-    public boolean validarEquipoPorJornada(Connection conexion, String idEquipo, String jornada) {
+    public boolean validarEquipoPorJornada(Connection conexion, String idEquipo, int jornada) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         boolean rta = false;
@@ -183,12 +183,12 @@ public class PartidoDAO {
         try {
 
             cadSQL = new StringBuilder();
-            cadSQL.append("Select paq.part_id  FROM partido_equipo paq");
-            cadSQL.append(" INNER JOIN partido pa ON pa.part_id = paq.part_id");
-            cadSQL.append("WHERE paq.equi_id = ? AND pa.part_jornada = ?");
+            cadSQL.append(" SELECT paq.part_id  FROM partido_equipo paq");
+            cadSQL.append(" INNER JOIN partido pa ON pa.part_id = paq.part_id ");
+            cadSQL.append(" WHERE paq.equi_id = ? AND pa.part_jornada = ?");
             ps = conexion.prepareStatement(cadSQL.toString());
             AsignaAtributoStatement.setString(1, idEquipo, ps);
-            AsignaAtributoStatement.setString(2, jornada, ps);
+            AsignaAtributoStatement.setString(2, String.valueOf(jornada), ps);
 
             rs = ps.executeQuery();
 
@@ -213,6 +213,58 @@ public class PartidoDAO {
             } catch (Exception e) {
                 LoggerMessage.getInstancia().loggerMessageException(e);
                 return false;
+            }
+        }
+
+        return rta;
+    }
+
+    /**
+     *
+     * @param conexion
+     * @param idEquipoA
+     * @param idEquipoB
+     * @return
+     */
+    public int validarEquipoPorPartidos(Connection conexion, String idEquipoA, String idEquipoB) {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int rta = 0;
+        StringBuilder cadSQL = null;
+
+        try {
+
+            cadSQL = new StringBuilder();
+            cadSQL.append(" SELECT COUNT(paq.part_id) as partidos FROM partido_equipo paq ");
+            cadSQL.append(" WHERE paq.equi_id = ? or paq.equi_id = ?");
+
+            ps = conexion.prepareStatement(cadSQL.toString());
+            AsignaAtributoStatement.setString(1, idEquipoA, ps);
+            AsignaAtributoStatement.setString(2, idEquipoB, ps);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                rta = rs.getInt("partidos");
+
+            }
+            ps.close();
+            ps = null;
+
+        } catch (Exception e) {
+            LoggerMessage.getInstancia().loggerMessageException(e);
+            return -1;
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                    ps = null;
+                    rs.close();
+                    rs = null;
+                }
+            } catch (Exception e) {
+                LoggerMessage.getInstancia().loggerMessageException(e);
+                return -1;
             }
         }
 
