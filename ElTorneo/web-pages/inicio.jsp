@@ -79,10 +79,10 @@
     </head>
 
     <body>
-        <div class="container" id="hola">
+        <div class="container" >
             <header>
                 
-                <nav class="navbar navbar-default">
+                <nav class="navbar navbar-default" id="hola">
                     <div class="container"  >
                         <div class="navbar-header">
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav1">
@@ -93,7 +93,7 @@
                             </button>
                             <h4>El Torneo</h4>
                         </div>
-                        <div class="collapse navbar-collapse" id="nav1" >
+                        <div class="collapse navbar-collapse" >
                             <ul class="nav navbar-nav">
                                 <% for (MenuDTO elem : menu) {%>                             
                                 <li class="dropdown">  

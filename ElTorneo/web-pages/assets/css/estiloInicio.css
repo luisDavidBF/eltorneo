@@ -2,13 +2,17 @@ body{
         background: url(../images/bg_tiza.jpg);
         background-size: cover;
         background-position: center;
-    
 }
 
 #contenidoPrincipal{
     background: rgba(255,255,255,0);
+    
 }
 
 #hola{
-    background-color: #004db6;
+        margin-top: 1px;
+        background-color: rgba(0,218,85,1);    
+        color:black;
+        border-radius: 10px;
+        border:none;
 }

@@ -66,10 +66,10 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="col-sm-6 mx-auto" style="text-align: -webkit-center;">
-                        <button type="submit" id="boton" class="btn btn-success mr-2" onclick="validar('reg_usuario', 1);">Registrar</button>   
-                        <button type="button" id="boton2" class="btn btn-success mr-2" onclick="sorteo();">sorteo</button>   
+                        <button type="submit"  class="btn btn-success mr-2" onclick="validar('reg_usuario', 1);">Registrar</button>   
+                        <button type="button"  class="btn btn-success mr-2" onclick="sorteo();">sorteo</button>   
                     </div>
-                    <input class="btn btn-light" type="button" value="Volver" onclick="javascript:redireccionar();">
+                    <input class="btn btn-light"  id="boton2" type="button" value="Volver" onclick="javascript:redireccionar();">
                 </div>
             </div>
         </form>
